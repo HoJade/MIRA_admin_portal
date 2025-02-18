@@ -118,6 +118,7 @@ test.describe('MIRA Admin portal Login page', () => {
         await page.getByRole('button', { name: 'Sign in' }).click();
 
         // land to MIRA Admin portal main landing page
+        await page.waitForURL(/home/)
         await expect(page).toHaveURL(/home/);
         await expect(page.locator('app-home').getByRole('img')).toBeVisible({ timeout: 20000 });
         const user_name = await page.locator('[class="user-name font-semibold"]').innerText()
@@ -648,6 +649,22 @@ test.describe('Users', () => {
             await expect(page.locator('[formcontrolname="groups"]')).toHaveText(groups_selection)
             console.log('Selected Groups:', groups_selection)
         });
+
+        test('check Production/Quality Team logic in Groups selection', async ({ page }) => {
+            await page.locator('[formcontrolname="groups"]').click()
+            // select Production
+            await page.getByRole('option', { name: 'Production' }).click()
+            await expect(page.getByRole('option', { name: 'Quality Team' })).toBeDisabled()
+            // un-select Production
+            await page.getByRole('option', { name: 'Production' }).click()
+            await expect(page.getByRole('option', { name: 'Quality Team' })).toBeEnabled()
+            // select Quality Team
+            await page.getByRole('option', { name: 'Quality Team' }).click()
+            await expect(page.getByRole('option', { name: 'Production' })).toBeDisabled()
+            // un-select Quality Team
+            await page.getByRole('option', { name: 'Quality Team' }).click()
+            await expect(page.getByRole('option', { name: 'Production' })).toBeEnabled()
+        })
 
         test('check Name auto-display', async ({ page }) => {
             await page.locator('[formcontrolname="name"]').fill(credentials.nameValid)
