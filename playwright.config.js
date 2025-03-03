@@ -12,8 +12,24 @@ const { defineConfig, devices } = require('@playwright/test');
  */
 
 
-// import baseURL
-import { mira_admin_baseURL } from './config/credential'
+// import artillery cloud api key
+import { ARTILLERY_CLOUD_API_KEY } from './config/credential'
+
+// set up reporters; Keep the HTML report if needed, so you can still generate local HTML reports
+const reporters = [
+  ["html"]
+];
+
+// Enable Artillery Cloud reporter only if the environment variable is set
+// Default ENABLE_ARTILLERY_REPORTER to "false" if not explicitly set
+const enableArtilleryReporter = !!process.env.ENABLE_ARTILLERY_REPORTER && process.env.ENABLE_ARTILLERY_REPORTER.toLowerCase() === "true";
+
+if (enableArtilleryReporter) {
+  // Set the Artillery Cloud API Key
+  process.env.ARTILLERY_CLOUD_API_KEY = ARTILLERY_CLOUD_API_KEY;
+  reporters.push(["@artilleryio/playwright-reporter", { name: "My Test Suite" }]);
+}
+
 
 // Detect if the test is being retried
 const isRetry = process.env.PLAYWRIGHT_RETRIES === 'true';
@@ -30,7 +46,7 @@ module.exports = defineConfig({
   /* Retry on CI only */
   //retries: process.env.CI ? 2 : 0,
   retries: 1,
-  timeout: 15 * 1000,     // originally, the global timeout = 30 sec
+  timeout: 20 * 1000,     // originally, the global timeout = 30 sec
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
@@ -43,12 +59,13 @@ module.exports = defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  // originally, reporter: 'html',
+  reporter: reporters,
+
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://127.0.0.1:3000',
-    baseURL: mira_admin_baseURL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on',      // on-first-retry | on-all-retry | off | on | retain-on-failure
