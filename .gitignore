@@ -7,4 +7,16 @@ node_modules/
 
 config/
 trace-viewer/
-tests/record_trace.spec.js-snapshots/
+
+tests/MIRA_Admin_LoginPage/LoginPage.spec.js-snapshots/
+tests/MIRA_Admin_HomePage/HomePage.spec.js-snapshots/
+tests/MIRA_Admin_Customers/Customers.spec.js-snapshots/
+tests/MIRA_Admin_Users/Users_elements.spec.js-snapshots/
+tests/MIRA_Admin_Users/Groups_elements.spec.js-snapshots/
+tests/MIRA_Admin_Users/Groups_e2e.spec.js-snapshots/
+tests/MIRA_Admin_Orders/Orders.spec.js-snapshots/
+tests/MIRA_Admin_TravelerBuilder/TravelerBuilder.spec.js-snapshots/
+
+tests/MIRA_Production/LoginPage.spec.js-snapshots/
+tests/MIRA_Production/Products.spec.js-snapshots/
+tests/MIRA_Production/All_Orders.spec.js-snapshots/
