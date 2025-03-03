@@ -86,7 +86,7 @@ test.describe('Navigation Bar', () => {
     test('Home Button', async ({ page }) => {
 
         // Pre-requisite: on any page other than the main landing page
-        await page.goto('/profile/change-password')
+        await page.goto(`${credentials.mira_admin_baseURL}/profile/change-password`)
         // click on the Home button
         await page.click('[class="hidden lg:flex cursor-pointer"]')
         // check if directed to the main landing page
