@@ -48,9 +48,10 @@ test.describe('Groups page', async () => {
 
     test('check Administrators, Production, Quality Team Group', async ({ page }) => {
         await expect(page).toHaveURL(/\/users\/groups\/all\/?$/);
-        await expect(page.locator('.ng-star-inserted > div > div > div').filter({ hasText: /^Administrators$/ })).toBeVisible()
-        await expect(page.locator('.ng-star-inserted > div > div > div').filter({ hasText: /^Production$/ }).nth(0)).toBeVisible()
-        await expect(page.locator('.ng-star-inserted > div > div > div').filter({ hasText: /^Quality Team$/ })).toBeVisible()
+        const tableColumn_Name = page.locator('.ng-star-inserted > div > div > div')
+        await expect(tableColumn_Name.filter({ hasText: /^Administrators$/ })).toBeVisible()
+        await expect(tableColumn_Name.filter({ hasText: /^Production$/ })).toBeVisible()
+        await expect(tableColumn_Name.filter({ hasText: /^Quality Team$/ })).toBeVisible()
     })
 });
 
@@ -73,18 +74,28 @@ test.describe('Add Group sub-page', async () => {
         // check Group Info box
         await expect(page.locator('.card')).toHaveText(/Group/)
         // check Group Name field
-        await expect(page.locator('mat-form-field > div > div > div > label').nth(0)).toHaveText(/Group Name/)
-        await expect(page.locator('mat-form-field > div > div > div > label > span').nth(0)).toBeVisible()
+        const locator_groupName = page.locator('label').filter({ hasText: /^\s*Group Name\s*$/ })
+        await expect(locator_groupName).toBeVisible()
+        await expect(locator_groupName.locator('span')).toBeVisible()
         await expect(page.locator('[formcontrolname="name"]')).toBeVisible()
+        // check input limit
+        const input_groupName = page.locator('input[formcontrolname="name"]')
+        const hintId_groupName = await input_groupName.getAttribute('aria-describedby')
+        await expect(page.locator(`#${hintId_groupName}`)).toHaveText('0/50')
+
         // check Roles drop-down field
-        await expect(page.locator('mat-form-field > div > div > div > label').nth(1)).toHaveText(/Roles/)
-        await expect(page.locator('mat-form-field > div > div > div > label > span').nth(1)).toBeVisible()
+        const locator_roles = page.locator('label').filter({ hasText: /^\s*Roles\s*$/ })
+        await expect(locator_roles).toBeVisible()
+        await expect(locator_roles.locator('span')).toBeVisible()
         await expect(page.locator('[formcontrolname="groupRoles"]')).toBeVisible()
         await expect(page.getByLabel('Roles').locator('svg')).toBeVisible()
+
         // check Users drop-down field
-        await expect(page.locator('mat-form-field > div > div > div > label').nth(2)).toHaveText(/Users/)
+        const locator_users = page.locator('label').filter({ hasText: /^\s*Users\s*$/ })
+        await expect(locator_users).toBeVisible()
         await expect(page.locator('[formcontrolname="userGroups"]')).toBeVisible()
         await expect(page.getByLabel('Users').locator('svg')).toBeVisible()
+
         // check button
         await expect(page.getByRole('button', { name: 'Add Group' })).toBeVisible();
         await expect(page.getByRole('button', { name: 'Add Group' })).toBeDisabled();
@@ -105,13 +116,13 @@ test.describe('Add Group sub-page', async () => {
     test('check error messages for having empty field', async ({ page }) => {
         // Group Name field
         await page.locator('[formcontrolname="name"]').fill('')
-        await page.locator('mat-form-field > div > div > div > label').nth(0).click()
-        await expect(page.locator('mat-error').nth(0)).toHaveText(new RegExp(credentials.groupNameMissing_message))
+        await page.locator('label').filter({ hasText: /^\s*Group Name\s*$/ }).click()
+        await expect(page.locator('mat-error').filter({ hasText: new RegExp(credentials.groupName_missing_message) })).toBeVisible()
         // Roles field
         await page.locator('[formcontrolname="groupRoles"]').click()
         // press the Escape key to collapse the dropdown
         await page.keyboard.press('Escape')
-        await expect(page.locator('mat-error').nth(1)).toHaveText(new RegExp(credentials.rolesMissing_message))
+        await expect(page.locator('mat-error').filter({ hasText: new RegExp(credentials.roles_missing_message) })).toBeVisible()
     });
 
 
@@ -119,20 +130,28 @@ test.describe('Add Group sub-page', async () => {
         // input Username field with more than 50 characters
         await page.locator('[formcontrolname="name"]').fill(credentials.over50Char)
         // check the displayed Group Name
-        const cap50CharGroupName = await page.inputValue('[formcontrolname="name"]')
-        await expect(cap50CharGroupName).toBe('a'.repeat(50))
+        const cap50Char_GroupName = await page.inputValue('[formcontrolname="name"]')
+        await expect(cap50Char_GroupName).toBe('a'.repeat(50))
         console.log('#Try to input at Group Name:', credentials.over50Char)
         console.log('Length of input Group Name:', credentials.over50Char.length)
-        console.log('Actual displayed Group Name:', cap50CharGroupName)
-        console.log('Length of displayed Group Name:', cap50CharGroupName.length)
+        console.log('Actual displayed Group Name:', cap50Char_GroupName)
+        console.log('Length of displayed Group Name:', cap50Char_GroupName.length)
     });
 
 
     test('check Roles selection', async ({ page }) => {
-        await page.locator('[formcontrolname="groupRoles"]').click()
+        // await page.waitForLoadState('networkidle');
+        const roles_dropdown = page.locator('[formcontrolname="groupRoles"]')
+        await expect(roles_dropdown).toBeVisible();
+        await roles_dropdown.click({ force: true })
+        await page.waitForSelector('div[role="listbox"]', { state: 'attached', timeout: 8000 });
+        await page.waitForSelector('mat-option', { state: 'visible', timeout: 8000 })
+
         // select the first role option
-        await page.getByRole('option').nth(0).click()
-        const roles_selection = await page.getByRole('option').nth(0).innerText()
+        const roles_option = page.getByRole('option').first()
+        const roles_selection = await roles_option.innerText()
+        await roles_option.click()
+        // press the Escape key to collapse the dropdown
         await page.keyboard.press('Escape')
         await expect(page.locator('[formcontrolname="groupRoles"]')).toHaveText(roles_selection)
         console.log('Selected Roles:', roles_selection)
@@ -140,10 +159,18 @@ test.describe('Add Group sub-page', async () => {
 
 
     test('check Users selection', async ({ page }) => {
-        await page.locator('[formcontrolname="userGroups"]').click()
+        // await page.waitForLoadState('networkidle');
+        const users_dropdown = page.locator('[formcontrolname="userGroups"]')
+        await expect(users_dropdown).toBeVisible();
+        await users_dropdown.click()
+        await page.waitForSelector('div[role="listbox"]', { state: 'attached', timeout: 8000 });
+        await page.waitForSelector('mat-option', { state: 'visible', timeout: 8000 })
+
         // select the first user option
-        await page.getByRole('option').nth(0).click()
-        const users_selection = await page.getByRole('option').nth(0).innerText()
+        const users_option = page.getByRole('option').first()
+        const users_selection = await users_option.innerText()
+        await users_option.click()
+        // press the Escape key to collapse the dropdown
         await page.keyboard.press('Escape')
         await expect(page.locator('[formcontrolname="userGroups"]')).toHaveText(users_selection)
         console.log('Selected Users:', users_selection)
@@ -151,18 +178,18 @@ test.describe('Add Group sub-page', async () => {
 
 
     test('check Group Name auto-display', async ({ page }) => {
-        await page.locator('[formcontrolname="name"]').fill(credentials.groupNameValid)
+        await page.locator('[formcontrolname="name"]').fill(credentials.groupName_valid)
         // check the inputted Group Name
-        const inputtedGroupName = await page.inputValue('[formcontrolname="name"]')
-        console.log('Inputted Name:', inputtedGroupName)
-        await expect(page.locator('legend')).toHaveText(inputtedGroupName)
+        const inputted_GroupName = await page.inputValue('[formcontrolname="name"]')
+        console.log('Inputted Name:', inputted_GroupName)
+        await expect(page.locator('legend')).toHaveText(inputted_GroupName)
     })
 
 
     test('check buttons are enabled after valid input', async ({ page }) => {
         test.setTimeout(30000);             // Set timeout to 30 seconds for this test
         // input valid Group Name, Roles
-        await page.locator('[formcontrolname="name"]').fill(credentials.groupNameValid)
+        await page.locator('[formcontrolname="name"]').fill(credentials.groupName_valid)
         // select the first role option
         await page.locator('[formcontrolname="groupRoles"]').click()
         await page.getByRole('option').nth(0).click()
