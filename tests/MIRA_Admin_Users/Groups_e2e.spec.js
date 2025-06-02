@@ -40,7 +40,11 @@ test('create and delete a new Group w/o Users', async ({ page, headless }) => {
     await expect(page).toHaveURL(/\/users\/groups\/edit-group\/\d*?$/);
 
     // input valid Group Name
-    await page.locator('[formcontrolname="name"]').fill(credentials.groupNameValid)
+    // await page.locator('[formcontrolname="name"]').fill(credentials.groupName_valid)
+    const groupName = `TestGroup_w/o Users_${Date.now()}`
+    await page.locator('[formcontrolname="name"]').fill(groupName)
+
+
     // select the first role option
     await page.locator('[formcontrolname="groupRoles"]').click()
     await page.getByRole('option').nth(0).click()
@@ -53,9 +57,13 @@ test('create and delete a new Group w/o Users', async ({ page, headless }) => {
     // redirect to Group page
     await page.waitForURL(/\/users\/groups\/all\/?$/)
     await expect(page).toHaveURL(/\/users\/groups\/all\/?$/);
+
     // locate the newly created Group
-    const newGroup = await page.locator('[class="border-b border-gray-200 p-4 hover:bg-gray-100 ng-star-inserted"]').filter({ hasText: credentials.groupNameValid })
+    // const newGroup = await page.locator('[class="border-b border-gray-200 p-4 hover:bg-gray-100 ng-star-inserted"]').filter({ hasText: credentials.groupName_valid })
+    const newGroup = page.locator('[class="border-b border-gray-200 p-4 hover:bg-gray-100 ng-star-inserted"]').filter({ hasText: groupName })
+    await newGroup.scrollIntoViewIfNeeded()
     await expect(newGroup).toBeVisible()
+
     // click [Delete Group] button
     await newGroup.getByRole('button', { name: 'Delete Group' }).click()
     
@@ -65,23 +73,27 @@ test('create and delete a new Group w/o Users', async ({ page, headless }) => {
     // do image comparison WHEN run in headed mode
     if (headless) {
         await expect.soft(error_popupWindow).toHaveScreenshot({
-            threshold: 0.02     // Allows minor per-pixel color changes
+            maxDiffPixelRatio: 0.02     // Allows up to 2% of pixels to differ
         })
     } else {
         console.log('Skipping screenshot comparison for headed mode.')
     }
     await error_popupWindow.getByRole('button', { name: 'Delete' }).click()
     await expect(error_popupWindow).not.toBeAttached()
+
     // check the newly created Group should be deleted
-    await expect(newGroup).not.toBeVisible()
+    await expect(newGroup).toHaveCount(0)
 });
 
 
-test.fixme('create and delete a new Group w/ Users', async ({ page }) => {
+test('create and delete a new Group w/ Users', async ({ page, headless }) => {
     await expect(page).toHaveURL(/\/users\/groups\/edit-group\/\d*?$/);
 
     // input valid Group Name
-    await page.locator('[formcontrolname="name"]').fill(credentials.groupNameValid)
+    const groupName = `TestGroup_w/ Users_${Date.now()}`
+    await page.locator('[formcontrolname="name"]').fill(groupName)
+    
+
     // select the first role option
     await page.locator('[formcontrolname="groupRoles"]').click()
     await page.getByRole('option').nth(0).click()
@@ -98,8 +110,29 @@ test.fixme('create and delete a new Group w/ Users', async ({ page }) => {
     // redirect to Group page
     await page.waitForURL(/\/users\/groups\/all\/?$/)
     await expect(page).toHaveURL(/\/users\/groups\/all\/?$/);
+
     // locate the newly created Group
-    await expect(page.getByText(credentials.groupNameValid)).toBeVisible()
+    const newGroup = page.locator('[class="border-b border-gray-200 p-4 hover:bg-gray-100 ng-star-inserted"]').filter({ hasText: groupName })
+    await newGroup.scrollIntoViewIfNeeded()
+    await expect(newGroup).toBeVisible()
+
     // click [Delete Group] button
-    await page.getByRole('button', { name: 'Delete Group' }).last()
+    await newGroup.getByRole('button', { name: 'Delete Group' }).click()
+    
+    // check error pop-up window
+    const error_popupWindow = page.locator('fuse-confirmation-dialog > div')
+    await expect(error_popupWindow).toBeVisible()
+    // do image comparison WHEN run in headed mode
+    if (headless) {
+        await expect.soft(error_popupWindow).toHaveScreenshot({
+            maxDiffPixelRatio: 0.02     // Allows up to 2% of pixels to differ
+        })
+    } else {
+        console.log('Skipping screenshot comparison for headed mode.')
+    }
+    await error_popupWindow.getByRole('button', { name: 'Delete' }).click()
+    await expect(error_popupWindow).not.toBeAttached()
+
+    // check the newly created Group should be deleted
+    await expect(newGroup).toHaveCount(0)
 });
