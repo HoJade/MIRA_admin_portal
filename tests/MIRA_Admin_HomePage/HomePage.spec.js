@@ -44,19 +44,6 @@ test.describe('Navigation Bar', () => {
     });
 
 
-    test('Users Menu', async ({ page }) => {
-
-        // click on the Users Navigation button
-        await page.locator('fuse-horizontal-navigation-branch-item').filter({ hasText: 'Users' }).click();
-        // locate all the corresponding Menu Items
-        const menuItems = await page.locator('span > fuse-horizontal-navigation-basic-item');
-        const allMenuTexts = await menuItems.allInnerTexts();
-        console.log('Menu Items:', allMenuTexts);
-        // check if the Menu Items are as expected
-        await expect(allMenuTexts).toEqual(credentials.usersMenuItems);
-    });
-
-
     test('Orders Menu', async ({ page }) => {
 
         // click on the Users Navigation button
@@ -67,6 +54,32 @@ test.describe('Navigation Bar', () => {
         console.log('Menu Items:', allMenuTexts);
         // check if the Menu Items are as expected
         await expect(allMenuTexts).toEqual(credentials.ordersMenuItems);
+    });
+
+
+    test('Records Menu', async ({ page }) => {
+
+        // click on the Customers Navigation button
+        await page.locator('fuse-horizontal-navigation-branch-item').filter({ hasText: /^\s*Records\s*$/ }).click();
+        // locate all the corresponding Menu Items
+        const menuItems = await page.locator('span > fuse-horizontal-navigation-basic-item');
+        const allMenuTexts = await menuItems.allInnerTexts();
+        console.log('Menu Items:', allMenuTexts);
+        // check if the Menu Items are as expected
+        await expect(allMenuTexts).toEqual(credentials.recordsMenuItems);
+    });
+
+
+    test('Users Menu', async ({ page }) => {
+
+        // click on the Users Navigation button
+        await page.locator('fuse-horizontal-navigation-branch-item').filter({ hasText: 'Users' }).click();
+        // locate all the corresponding Menu Items
+        const menuItems = await page.locator('span > fuse-horizontal-navigation-basic-item');
+        const allMenuTexts = await menuItems.allInnerTexts();
+        console.log('Menu Items:', allMenuTexts);
+        // check if the Menu Items are as expected
+        await expect(allMenuTexts).toEqual(credentials.usersMenuItems);
     });
 
 
@@ -138,7 +151,7 @@ test.describe('Account Menu', () => {
             // do image comparison WHEN run in headed mode
             if (headless) {
                 await expect.soft(page).toHaveScreenshot({
-                    threshold: 0.02     // Allows minor per-pixel color changes
+                    maxDiffPixelRatio: 0.02     // Allows up to 2% of pixels to differ
                 })
             } else {
                 console.log('Skipping screenshot comparison for headed mode.')
@@ -150,15 +163,15 @@ test.describe('Account Menu', () => {
             // Current Password field
             await page.locator('#currentPassword').fill('')
             await page.locator('label').filter({ hasText: /^Current Password$/ }).click()
-            await expect(page.locator('mat-error').filter({ hasText: credentials.currentPasswordMissing_message })).toBeVisible()
+            await expect(page.locator('mat-error').filter({ hasText: credentials.currentPassword_missing_message })).toBeVisible()
             // New Password field
             await page.locator('#newPassword').fill('')
             await page.locator('label').filter({ hasText: /^New Password$/ }).click()
-            await expect(page.locator('mat-error').filter({ hasText: credentials.newPasswordMissing_message })).toBeVisible()
+            await expect(page.locator('mat-error').filter({ hasText: credentials.newPassword_missing_message })).toBeVisible()
             // Confirm New Password
             await page.locator('#confirmPassword').fill('')
             await page.locator('label').filter({ hasText: /^Confirm New Password$/ }).click()
-            await expect(page.locator('mat-error').filter({ hasText: credentials.confirmNewPasswordMissing_message })).toBeVisible()
+            await expect(page.locator('mat-error').filter({ hasText: credentials.confirmNewPassword_missing_message })).toBeVisible()
         });
 
 
@@ -166,7 +179,7 @@ test.describe('Account Menu', () => {
             // New Password field
             await page.locator('#newPassword').fill('1')
             await page.locator('label').filter({ hasText: /^New Password$/ }).click()
-            await expect(page.locator('mat-error').filter({ hasText: credentials.newPasswordShort_message })).toBeVisible()
+            await expect(page.locator('mat-error').filter({ hasText: credentials.newPassword_short_message })).toBeVisible()
         });
 
 
@@ -174,7 +187,7 @@ test.describe('Account Menu', () => {
             // New Password field
             await page.locator('#newPassword').fill(' ')
             await page.locator('label').filter({ hasText: /^New Password$/ }).click()
-            await expect(page.locator('mat-error').filter({ hasText: credentials.newPasswordSpace_message })).toBeVisible()
+            await expect(page.locator('mat-error').filter({ hasText: credentials.newPassword_space_message })).toBeVisible()
         });
 
 
@@ -184,7 +197,7 @@ test.describe('Account Menu', () => {
             // Confirm New Password field
             await page.locator('#confirmPassword').fill('2')
             await page.locator('label').filter({ hasText: /^Confirm New Password$/ }).click()
-            await expect(page.locator('mat-form-field').filter({ hasText: 'Confirm New Password' }).locator('mat-error')).toHaveText(new RegExp(credentials.confirmNewPasswordNotMatch_message))
+            await expect(page.locator('mat-form-field').filter({ hasText: 'Confirm New Password' }).locator('mat-error')).toHaveText(new RegExp(credentials.confirmNewPassword_notMatch_message))
         });
 
 
@@ -197,23 +210,23 @@ test.describe('Account Menu', () => {
             const revealedCurrentPassword = await page.inputValue('#currentPassword')
             expect(revealedCurrentPassword).toBe(credentials.password_true)
 
-            await page.getByRole('textbox', { name: 'New Password', exact: true }).fill(credentials.passwordValid)
+            await page.getByRole('textbox', { name: 'New Password', exact: true }).fill(credentials.password_valid)
             await page.locator('mat-form-field').nth(1).getByRole('button').click()
             const revealedNewPassword = await page.inputValue('#newPassword')
-            expect(revealedNewPassword).toBe(credentials.passwordValid)
+            expect(revealedNewPassword).toBe(credentials.password_valid)
 
-            await page.getByRole('textbox', { name: 'Confirm New Password', exact: true }).fill(credentials.passwordValid)
+            await page.getByRole('textbox', { name: 'Confirm New Password', exact: true }).fill(credentials.password_valid)
             await page.locator('mat-form-field').filter({ hasText: 'Confirm New Password' }).getByRole('button').click()
             const revealedConfirmNewPassword = await page.inputValue('#confirmPassword')
-            expect(revealedConfirmNewPassword).toBe(credentials.passwordValid)
+            expect(revealedConfirmNewPassword).toBe(credentials.password_valid)
         });
 
 
         test('check button is enabled after valid input', async ({ page }) => {
             // input valid Current Password, New Password, Confirm New Password
             await page.locator('#currentPassword').fill(credentials.password_true)
-            await page.locator('#newPassword').fill(credentials.passwordValid)
-            await page.locator('#confirmPassword').fill(credentials.passwordValid)
+            await page.locator('#newPassword').fill(credentials.password_valid)
+            await page.locator('#confirmPassword').fill(credentials.password_valid)
             await expect(page.getByRole('button', { name: 'Change Password' })).toBeEnabled()
         });
 
@@ -221,18 +234,18 @@ test.describe('Account Menu', () => {
         test('check error tooltip for incorrect Current Password', async ({ page, headless }) => {
             // input incorrect Current Password
             await page.locator('#currentPassword').fill(credentials.password_false)
-            await page.locator('#newPassword').fill(credentials.passwordValid)
-            await page.locator('#confirmPassword').fill(credentials.passwordValid)
+            await page.locator('#newPassword').fill(credentials.password_valid)
+            await page.locator('#confirmPassword').fill(credentials.password_valid)
             await page.getByRole('button', { name: 'Change Password' }).click()
             // check error tooltip
             await expect(page.locator('fuse-alert')).toBeVisible()
             const error_tooltip = page.locator('fuse-alert > div')
             // await error_tooltip.waitFor({ state: 'visible' })        // redundant code
-            await expect(error_tooltip).toHaveText(new RegExp(credentials.incorrectPasswordReset_tooltip))
+            await expect(error_tooltip).toHaveText(new RegExp(credentials.incorrectPassword_reset_tooltip))
             // do image comparison WHEN run in headed mode
             if (headless) {
                 await expect.soft(error_tooltip).toHaveScreenshot({
-                    threshold: 0.02     // Allows minor per-pixel color changes
+                    maxDiffPixelRatio: 0.02     // Allows up to 2% of pixels to differ
                 });
             } else {
                 console.log('Skipping screenshot comparison for headed mode.')
