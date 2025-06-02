@@ -81,7 +81,7 @@ test.describe('MIRA Admin portal Login page', () => {
         // do image comparison WHEN run in headed mode
         if (headless) {
             await expect.soft(page).toHaveScreenshot({
-                threshold: 0.02     // Allows minor per-pixel color changes
+                maxDiffPixelRatio: 0.02     // Allows up to 2% of pixels to differ
             })
         } else {
             console.log('Skipping screenshot comparison for headed mode.')
@@ -93,11 +93,11 @@ test.describe('MIRA Admin portal Login page', () => {
         // Username field
         await page.locator('#username').fill('')
         await page.locator('label').filter({ hasText: 'Username' }).click()
-        await expect(page.locator('mat-error').filter({ hasText: credentials.usernameMissing_message })).toBeVisible()
+        await expect(page.locator('mat-error').filter({ hasText: credentials.username_missing_message })).toBeVisible()
         // Password field
         await page.locator('#password').fill('')
         await page.locator('label').filter({ hasText: 'Password' }).click()
-        await expect(page.locator('mat-error').filter({ hasText: credentials.passwordMissing_message })).toBeVisible()
+        await expect(page.locator('mat-error').filter({ hasText: credentials.password_missing_message })).toBeVisible()
     })
 
 
@@ -191,7 +191,7 @@ test.describe('MIRA Admin portal Login page', () => {
             // do image comparison WHEN run in headed mode
             if (headless) {
                 await expect.soft(page).toHaveScreenshot({
-                    threshold: 0.02     // Allows minor per-pixel color changes
+                    maxDiffPixelRatio: 0.02     // Allows up to 2% of pixels to differ
                 })
             } else {
                 console.log('Skipping screenshot comparison for headed mode.')
@@ -209,7 +209,7 @@ test.describe('MIRA Admin portal Login page', () => {
 
         test('check error message for invalid Email', async ({ page }) => {
             // Email field
-            await page.locator('#email').fill(credentials.emailInvalid)
+            await page.locator('#email').fill(credentials.email_invalid)
             await page.locator('label').filter({ hasText: 'Email' }).click()
 
             // check error message
@@ -227,7 +227,7 @@ test.describe('MIRA Admin portal Login page', () => {
             // do image comparison WHEN run in headed mode
             if (headless) {
                 await expect.soft(page).toHaveScreenshot({
-                    threshold: 0.02     // Allows minor per-pixel color changes
+                    maxDiffPixelRatio: 0.02     // Allows up to 2% of pixels to differ
                 })
             } else {
                 console.log('Skipping screenshot comparison for headed mode.')
