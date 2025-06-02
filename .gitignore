@@ -14,6 +14,7 @@ tests/MIRA_Admin_Customers/Customers.spec.js-snapshots/
 tests/MIRA_Admin_Users/Users_elements.spec.js-snapshots/
 tests/MIRA_Admin_Users/Groups_elements.spec.js-snapshots/
 tests/MIRA_Admin_Users/Groups_e2e.spec.js-snapshots/
+tests/MIRA_Admin_WorkInstructions/WorkInstructions.spec.js-snapshots/
 tests/MIRA_Admin_Orders/Orders.spec.js-snapshots/
 tests/MIRA_Admin_TravelerBuilder/TravelerBuilder.spec.js-snapshots/
 
