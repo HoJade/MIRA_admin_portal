@@ -34,18 +34,33 @@ test.describe('Add Customer page', async () => {
         // check Customer Info box
         await expect(page.locator('app-view-info')).toHaveText(/Customer/)
         // check Name field
-        await expect(page.locator('mat-form-field > div > div > div > label').nth(0)).toHaveText(/Name/)
-        await expect(page.locator('mat-form-field > div > div > div > label > span').nth(0)).toBeVisible()
+        const locator_name = page.locator('label').filter({ hasText: /^\s*Name\s*$/ })
+        await expect(locator_name).toBeVisible()
+        await expect(locator_name.locator('span')).toBeVisible()
         await expect(page.locator('[formcontrolname="customerName"]')).toBeVisible()
+        // check input limit
+        const input_name = page.locator('input[formcontrolname="customerName"]')
+        const hintId_name = await input_name.getAttribute('aria-describedby')
+        await expect(page.locator(`#${hintId_name}`)).toHaveText('0/50')
+
         // check Login field
-        await expect(page.locator('mat-form-field > div > div > div > label').nth(1)).toHaveText(/Login/)
-        await expect(page.locator('mat-form-field > div > div > div > label > span').nth(1)).toBeVisible()
+        const locator_login = page.locator('label').filter({ hasText: /^\s*Login\s*$/ })
+        await expect(locator_login).toBeVisible()
+        await expect(locator_login.locator('span')).toBeVisible()
         await expect(page.locator('[formcontrolname="login"]')).toBeVisible()
+        // check input limit
+        const input_login = page.locator('input[formcontrolname="login"]')
+        const hintId_login = await input_login.getAttribute('aria-describedby')
+        await expect(page.locator(`#${hintId_login}`)).toHaveText('0/20')
+
         // check Password field
-        await expect(page.locator('mat-form-field > div > div > div > label').nth(2)).toHaveText(/Password/)
-        await expect(page.locator('mat-form-field > div > div > div > label > span').nth(2)).toBeVisible()
+        const locator_password = page.locator('label').filter({ hasText: /^\s*Password\s*$/ })
+        await expect(locator_password).toBeVisible()
+        await expect(locator_password.locator('span')).toBeVisible()
         await expect(page.locator('[formcontrolname="password"]')).toBeVisible()
-        await expect(page.locator('form').getByRole('button')).toBeVisible()
+        // check reveal button
+        await expect(page.locator('mat-form-field').filter({ hasText: 'Password' }).getByRole('button')).toBeVisible()
+
         // check button
         await expect(page.getByRole('button', { name: 'Add Customer' })).toBeVisible();
         await expect(page.getByRole('button', { name: 'Add Customer' })).toBeDisabled();
@@ -64,48 +79,48 @@ test.describe('Add Customer page', async () => {
     test('check error messages for having empty field', async ({ page }) => {
         // Name field
         await page.locator('[formcontrolname="customerName"]').fill('')
-        await page.locator('mat-form-field > div > div > div > label').nth(0).click()
-        await expect(page.locator('mat-error').nth(0)).toHaveText(new RegExp(credentials.nameMissing_message))
+        await page.locator('label').filter({ hasText: /^\s*Name\s*$/ }).click()
+        await expect(page.locator('mat-error').filter({ hasText: new RegExp(credentials.name_missing_message) })).toBeVisible()
         // Login field
         await page.locator('[formcontrolname="login"]').fill('')
-        await page.locator('mat-form-field > div > div > div > label').nth(1).click()
-        await expect(page.locator('mat-error').nth(1)).toHaveText(new RegExp(credentials.loginMissing_message))
+        await page.locator('label').filter({ hasText: /^\s*Login\s*$/ }).click()
+        await expect(page.locator('mat-error').filter({ hasText: new RegExp(credentials.login_missing_message) })).toBeVisible()
         // Password field
         await page.locator('[formcontrolname="password"]').fill('')
-        await page.locator('mat-form-field > div > div > div > label').nth(2).click()
-        await expect(page.locator('mat-error').nth(2)).toHaveText(new RegExp(credentials.passwordMissing_message))
+        await page.locator('label').filter({ hasText: /^\s*Password\s*$/ }).click()
+        await expect(page.locator('mat-error').filter({ hasText: new RegExp(credentials.password_missing_message) })).toBeVisible()
     });
 
 
     test('check error messages for having less characters', async ({ page }) => {
         // Login field
         await page.locator('[formcontrolname="login"]').fill('1')
-        await page.locator('mat-form-field > div > div > div > label').nth(1).click()
-        await expect(page.locator('mat-error').nth(0)).toHaveText(new RegExp(credentials.loginShort_message))
+        await page.locator('label').filter({ hasText: /^\s*Login\s*$/ }).click()
+        await expect(page.locator('mat-error').filter({ hasText: new RegExp(credentials.login_short_message) })).toBeVisible()
         // Password field
         await page.locator('[formcontrolname="password"]').fill('1')
-        await page.locator('mat-form-field > div > div > div > label').nth(2).click()
-        await expect(page.locator('mat-error').nth(1)).toHaveText(new RegExp(credentials.passwordShort_message))
+        await page.locator('label').filter({ hasText: /^\s*Password\s*$/ }).click()
+        await expect(page.locator('mat-error').filter({ hasText: new RegExp(credentials.password_short_message) })).toBeVisible()
     });
 
 
     test('check error messages for having space character', async ({ page }) => {
         // Login field
         await page.locator('[formcontrolname="login"]').fill(' ')
-        await page.locator('mat-form-field > div > div > div > label').nth(1).click()
-        await expect(page.locator('mat-error').nth(0)).toHaveText(new RegExp(credentials.loginSpace_message))
+        await page.locator('label').filter({ hasText: /^\s*Login\s*$/ }).click()
+        await expect(page.locator('mat-error').filter({ hasText: new RegExp(credentials.login_space_message) })).toBeVisible()
         // Password field
         await page.locator('[formcontrolname="password"]').fill(' ')
-        await page.locator('mat-form-field > div > div > div > label').nth(2).click()
-        await expect(page.locator('mat-error').nth(3)).toHaveText(new RegExp(credentials.passwordSpace_message))
+        await page.locator('label').filter({ hasText: /^\s*Password\s*$/ }).click()
+        await expect(page.locator('mat-error').filter({ hasText: new RegExp(credentials.password_space_message) })).toBeVisible()
     });
 
 
     test('check error message for already existing Login', async ({ page }) => {
         // Login field
-        await page.locator('[formcontrolname="login"]').fill(credentials.loginAlrExist)
-        await page.locator('mat-form-field > div > div > div > label').nth(1).click()
-        await expect(page.locator('mat-error').nth(0)).toHaveText(new RegExp(credentials.loginAlrExist_message))
+        await page.locator('[formcontrolname="login"]').fill(credentials.login_alrExist)
+        await page.locator('label').filter({ hasText: /^\s*Login\s*$/ }).click()
+        await expect(page.locator('mat-error').filter({ hasText: new RegExp(credentials.login_alrExist_message) })).toBeVisible()
     });
 
 
@@ -113,12 +128,12 @@ test.describe('Add Customer page', async () => {
         // input Name field with more than 50 characters
         await page.locator('[formcontrolname="customerName"]').fill(credentials.over50Char)
         // check the displayed Name
-        const cap50CharName = await page.inputValue('[formcontrolname="customerName"]')
-        await expect(cap50CharName).toBe('a'.repeat(50))
+        const cap50Char_Name = await page.inputValue('[formcontrolname="customerName"]')
+        await expect(cap50Char_Name).toBe('a'.repeat(50))
         console.log('#Try to input at Name:', credentials.over50Char)
         console.log('Length of input Name:', credentials.over50Char.length)
-        console.log('Actual displayed Name:', cap50CharName)
-        console.log('Length of displayed Name:', cap50CharName.length)
+        console.log('Actual displayed Name:', cap50Char_Name)
+        console.log('Length of displayed Name:', cap50Char_Name.length)
     });
 
 
@@ -126,30 +141,36 @@ test.describe('Add Customer page', async () => {
         // input Login field with more than 20 characters
         await page.locator('[formcontrolname="login"]').fill(credentials.over20Char)
         // check the displayed Login
-        const cap20CharLogin = await page.inputValue('[formcontrolname="login"]')
-        await expect(cap20CharLogin).toBe('a'.repeat(20))
+        const cap20Char_Login = await page.inputValue('[formcontrolname="login"]')
+        await expect(cap20Char_Login).toBe('a'.repeat(20))
         console.log('#Try to input at Login:', credentials.over20Char)
         console.log('Length of input Login:', credentials.over20Char.length)
-        console.log('Actual displayed Login:', cap20CharLogin)
-        console.log('Length of displayed Name:', cap20CharLogin.length)
+        console.log('Actual displayed Login:', cap20Char_Login)
+        console.log('Length of displayed Name:', cap20Char_Login.length)
     });
 
 
     test('check valid Password input before/after revealing', async ({ page }) => {
         // input valid Password
-        await page.locator('[formcontrolname="password"]').fill(credentials.passwordValid)
+        await page.locator('[formcontrolname="password"]').fill(credentials.password_valid)
+        // check the icon
+        const icon_reveal = page.locator('mat-form-field').filter({ hasText: 'Password' }).getByRole('button')
+        await expect(icon_reveal.locator('mat-icon')).toHaveAttribute('data-mat-icon-name', 'eye')
         // click to reveal
-        await page.locator('mat-form-field').filter({ hasText: 'Password' }).getByRole('button').click();
+        await icon_reveal.click();
         const revealedPassword = await page.inputValue('[formcontrolname="password"]')
-        expect(revealedPassword).toBe(credentials.passwordValid)
+        expect(revealedPassword).toBe(credentials.password_valid)
+        // check the icon
+        const icon_conceal = page.locator('mat-form-field').filter({ hasText: 'Password' }).getByRole('button')
+        await expect(icon_conceal.locator('mat-icon')).toHaveAttribute('data-mat-icon-name', 'eye-slash')
     });
 
 
     test('check button is enabled after valid input', async ({ page }) => {
         // input valid Name, Login, Password
-        await page.locator('[formcontrolname="customerName"]').fill(credentials.nameValid)
-        await page.locator('[formcontrolname="login"]').fill(credentials.loginValid)
-        await page.locator('[formcontrolname="password"]').fill(credentials.passwordValid)
+        await page.locator('[formcontrolname="customerName"]').fill(credentials.name_valid)
+        await page.locator('[formcontrolname="login"]').fill(credentials.login_valid)
+        await page.locator('[formcontrolname="password"]').fill(credentials.password_valid)
         await expect(page.getByRole('button', { name: 'Add Customer' })).toBeEnabled();
     });
 });
