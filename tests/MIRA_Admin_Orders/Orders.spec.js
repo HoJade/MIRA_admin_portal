@@ -34,28 +34,38 @@ test.describe('Add Order page', async () => {
         // check Order Info box
         await expect(page.locator('.card')).toHaveText(/Order/)
         // check Customer drop-down field
-        await expect(page.locator('mat-form-field > div > div > div > label').nth(0)).toHaveText(/Customer/)
+        const locator_customer = page.locator('label').filter({ hasText: /^\s*Customer\s*$/ })
+        await expect(locator_customer).toBeVisible()
         await expect(page.locator('[formcontrolname="customer"]')).toBeVisible()
         await expect(page.getByLabel('Customer').locator('svg')).toBeVisible()
+
         // check Product drop-down field
-        await expect(page.locator('mat-form-field > div > div > div > label').nth(1)).toHaveText(/Product/)
-        await expect(page.locator('mat-form-field > div > div > div > label > span').nth(0)).toBeVisible()
+        const locator_product = page.locator('label').filter({ hasText: /^\s*Product\s*$/ })
+        await expect(locator_product).toBeVisible()
+        await expect(locator_product.locator('span')).toBeVisible()
         await expect(page.locator('[formcontrolname="productId"]')).toBeVisible()
         await expect(page.getByLabel('Product').locator('svg')).toBeVisible()
+
         // check Order Number field
-        await expect(page.locator('mat-form-field > div > div > div > label').nth(2)).toHaveText(/Order Number/)
-        await expect(page.locator('mat-form-field > div > div > div > label > span').nth(1)).toBeVisible()
+        const locator_orderNumber = page.locator('label').filter({ hasText: /^\s*Order Number\s*$/ })
+        await expect(locator_orderNumber).toBeVisible()
+        await expect(locator_orderNumber.locator('span')).toBeVisible()
         await expect(page.locator('[formcontrolname="orderNumber"]')).toBeVisible()
+
         // check Quantity field
-        await expect(page.locator('mat-form-field > div > div > div > label').nth(3)).toHaveText(/Quantity/)
-        await expect(page.locator('mat-form-field > div > div > div > label > span').nth(2)).toBeVisible()
+        const locator_quantity = page.locator('label').filter({ hasText: /^\s*Quantity\s*$/ })
+        await expect(locator_quantity).toBeVisible()
+        await expect(locator_quantity.locator('span')).toBeVisible()
         await expect(page.locator('[formcontrolname="qtyRequested"]')).toBeVisible()
+
         // check Due Date field
-        await expect(page.locator('mat-form-field > div > div > div > label').nth(4)).toHaveText(/Due date/)
-        await expect(page.locator('mat-form-field > div > div > div > label > span').nth(3)).toBeVisible()
+        const locator_dueDate = page.locator('label').filter({ hasText: /^\s*Due date\s*$/ })
+        await expect(locator_dueDate).toBeVisible()
+        await expect(locator_dueDate.locator('span')).toBeVisible()
         await expect(page.locator('[formcontrolname="dueDate"]')).toBeVisible()
-        await expect(page.locator('form').getByRole('button')).toBeVisible()
-        // check button
+        await expect(page.locator('mat-datepicker-toggle').getByRole('button')).toBeVisible()
+
+        // check buttons
         await expect(page.getByRole('button', { name: 'Add Order' })).toBeVisible();
         await expect(page.getByRole('button', { name: 'Add Order' })).toBeDisabled();
         await expect(page.getByRole('button', { name: 'Cancel' })).toBeVisible();
@@ -75,32 +85,32 @@ test.describe('Add Order page', async () => {
     test('check error messages for having empty field', async ({ page }) => {
         // Product field
         await page.locator('[formcontrolname="productId"]').click()
-        await page.keyboard.press('Escape')
-        await expect(page.locator('mat-error').nth(0)).toHaveText(new RegExp(credentials.productMissing_message))
+        await page.locator('label').filter({ hasText: /^\s*Product\s*$/ }).click()
+        await expect(page.locator('mat-error').filter({ hasText: new RegExp(credentials.product_missing_message) })).toBeVisible()
         // Order Number field
         await page.locator('[formcontrolname="orderNumber"]').fill('')
-        await page.locator('mat-form-field > div > div > div > label').nth(2).click()
-        await expect(page.locator('mat-error').nth(1)).toHaveText(new RegExp(credentials.orderNumberMissing_message))
+        await page.locator('label').filter({ hasText: /^\s*Order Number\s*$/ }).click()
+        await expect(page.locator('mat-error').filter({ hasText: new RegExp(credentials.orderNumber_missing_message) })).toBeVisible()
         // Quantity field
         await page.locator('[formcontrolname="qtyRequested"]').fill('')
-        await page.locator('mat-form-field > div > div > div > label').nth(3).click()
-        await expect(page.locator('mat-error').nth(2)).toHaveText(new RegExp(credentials.quantityMissing_message))
+        await page.locator('label').filter({ hasText: /^\s*Quantity\s*$/ }).click()
+        await expect(page.locator('mat-error').filter({ hasText: new RegExp(credentials.quantity_missing_message) })).toBeVisible()
         // Due Date field
         await page.locator('[formcontrolname="dueDate"]').click()
         await page.keyboard.press('Escape')
-        await expect(page.locator('mat-error').nth(3)).toHaveText(new RegExp(credentials.dueDateMissing_message))
+        await expect(page.locator('mat-error').filter({ hasText: (new RegExp(credentials.dueDate_missing_message)) })).toBeVisible()
     });
 
 
     test('check error messages for inputting 0', async ({ page }) => {
         // Order Number field
         await page.locator('[formcontrolname="orderNumber"]').fill('0')
-        await page.locator('mat-form-field > div > div > div > label').nth(2).click()
-        await expect(page.locator('mat-error').nth(0)).toHaveText(new RegExp(credentials.orderNumberCannotBeZero_message))
+        await page.locator('label').filter({ hasText: /^\s*Order Number\s*$/ }).click()
+        await expect(page.locator('mat-error').filter({ hasText: new RegExp(credentials.orderNumber_cannotBeZero_message) })).toBeVisible()
         // Quantity field
         await page.locator('[formcontrolname="qtyRequested"]').fill('0')
-        await page.locator('mat-form-field > div > div > div > label').nth(3).click()
-        await expect(page.locator('mat-error').nth(1)).toHaveText(new RegExp(credentials.quantityCannotBeZero_message))
+        await page.locator('label').filter({ hasText: /^\s*Quantity\s*$/ }).click()
+        await expect(page.locator('mat-error').filter({ hasText: new RegExp(credentials.quantity_cannotBeZero_message) })).toBeVisible()
     });
 
 
@@ -108,12 +118,12 @@ test.describe('Add Order page', async () => {
         // input Order Number field with more than 9 digits
         await page.locator('[formcontrolname="orderNumber"]').fill(credentials.over9Dig)
         // check the displayed Order Number
-        const cap9DigOrderNumber = await page.inputValue('[formcontrolname="orderNumber"]')
-        await expect(cap9DigOrderNumber).toBe('1'.repeat(9))
+        const cap9Dig_OrderNumber = await page.inputValue('[formcontrolname="orderNumber"]')
+        await expect(cap9Dig_OrderNumber).toBe('1'.repeat(9))
         console.log('#Try to input at Order Number:', credentials.over9Dig)
         console.log('Length of input Order Number:', credentials.over9Dig.length)
-        console.log('Actual displayed Order Number:', cap9DigOrderNumber)
-        console.log('Length of displayed Order Number:', cap9DigOrderNumber.length)
+        console.log('Actual displayed Order Number:', cap9Dig_OrderNumber)
+        console.log('Length of displayed Order Number:', cap9Dig_OrderNumber.length)
     });
 
 
@@ -121,41 +131,48 @@ test.describe('Add Order page', async () => {
         // input Quantity field with more than 5 digits
         await page.locator('[formcontrolname="qtyRequested"]').fill(credentials.over5Dig)
         // check the displayed Quantity
-        const cap5DigOrderNumber = await page.inputValue('[formcontrolname="qtyRequested"]')
-        await expect(cap5DigOrderNumber).toBe('1'.repeat(5))
+        const cap5Dig_OrderNumber = await page.inputValue('[formcontrolname="qtyRequested"]')
+        await expect(cap5Dig_OrderNumber).toBe('1'.repeat(5))
         console.log('#Try to input at Quantity:', credentials.over5Dig)
         console.log('Length of input Quantity:', credentials.over5Dig.length)
-        console.log('Actual displayed Quantity:', cap5DigOrderNumber)
-        console.log('Length of displayed Quantity:', cap5DigOrderNumber.length)
+        console.log('Actual displayed Quantity:', cap5Dig_OrderNumber)
+        console.log('Length of displayed Quantity:', cap5Dig_OrderNumber.length)
     });
 
 
     test('check error message for already existing Order Number', async ({ page }) => {
         // Order Number field
-        await page.locator('[formcontrolname="orderNumber"]').fill(credentials.orderNumberAlrExist)
-        await page.locator('mat-form-field > div > div > div > label').nth(2).click()
-        await expect(page.locator('mat-error').nth(0)).toHaveText(new RegExp(credentials.orderNumberAlrExist_message))
+        await page.locator('[formcontrolname="orderNumber"]').fill(credentials.orderNumber_alrExist)
+        await page.locator('label').filter({ hasText: /^\s*Order Number\s*$/ }).click()
+        await expect(page.locator('mat-error').filter({ hasText: new RegExp(credentials.orderNumber_alrExist_message) })).toBeVisible()
     });
 
 
-    test('check Customer selection', async ({ page }) => {
-        await page.locator('[formcontrolname="customer"]').click()
-        // select the first customer option
-        const customer_selection = await page.getByRole('option').nth(0).innerText()
-        await page.getByRole('option').nth(0).click()
+    test('check Customer selection; hence, Product selection', async ({ page }) => {
+        // Select customer
+        const customer_dropdown = page.locator('[formcontrolname="customer"]')
+        await expect(customer_dropdown).toBeVisible();
+        await customer_dropdown.click()
+        await page.waitForSelector('mat-option', { state: 'visible', timeout: 8000 })
+
+        const customer_option = page.getByRole('option').first()
+        const customer_selection = await customer_option.innerText()
+        await customer_option.click()
         await expect(page.locator('[formcontrolname="customer"]')).toHaveText(customer_selection)
         console.log('Selected Customer:', customer_selection)
-    });
 
-
-    test('check Product selection', async ({ page }) => {
+        // Select product
         await page.locator('[formcontrolname="productId"]').click()
-        // select the first product option
-        const product_selection = await page.getByRole('option').nth(0).innerText()
-        await page.getByRole('option').nth(0).click()
+
+        // Wait for new options to appear after customer triggers a change
+        await page.waitForTimeout(500) // or a better wait condition if you have one
+
+        const product_option = page.getByRole('option').first()
+        const product_selection = await product_option.innerText()
+        await product_option.click()
         await expect(page.locator('[formcontrolname="productId"]')).toHaveText(product_selection)
         console.log('Selected Product:', product_selection)
-    });
+    })
 
 
     test('check Due Date selection', async ({ page }) => {
@@ -167,23 +184,26 @@ test.describe('Add Order page', async () => {
 
 
     test('check Order Number auto-display', async ({ page }) => {
-        await page.locator('[formcontrolname="orderNumber"]').fill(credentials.orderNumberValid)
+        await page.locator('[formcontrolname="orderNumber"]').fill(credentials.orderNumber_valid)
         // check the inputted Order Number
-        const inputtedOrderNumber = await page.inputValue('[formcontrolname="orderNumber"]')
-        console.log('Inputted Order Number:', inputtedOrderNumber)
-        await expect(page.locator('legend')).toHaveText(inputtedOrderNumber)
+        const inputted_OrderNumber = await page.inputValue('[formcontrolname="orderNumber"]')
+        console.log('Inputted Order Number:', inputted_OrderNumber)
+        await expect(page.locator('legend')).toHaveText(inputted_OrderNumber)
     })
 
 
     test('check buttons are enabled after valid input', async ({ page }) => {
         test.setTimeout(30000);             // Set timeout to 30 seconds for this test
+        // select the first valid Customer option
+        await page.locator('[formcontrolname="customer"]').click()
+        await page.getByRole('option').nth(0).click()
         // select the first valid Product option
         await page.locator('[formcontrolname="productId"]').click()
         await page.getByRole('option').nth(0).click()
         // input valid Order Number
-        await page.locator('[formcontrolname="orderNumber"]').fill(credentials.orderNumberValid)
+        await page.locator('[formcontrolname="orderNumber"]').fill(credentials.orderNumber_valid)
         // input valid Quantity
-        await page.locator('[formcontrolname="qtyRequested"]').fill(credentials.quantityValid)
+        await page.locator('[formcontrolname="qtyRequested"]').fill(credentials.quantity_valid)
         // select valid Due Date
         await page.locator('[formcontrolname="dueDate"]').click()
         await page.locator('.mat-calendar-body-today').click()
