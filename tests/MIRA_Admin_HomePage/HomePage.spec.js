@@ -26,8 +26,10 @@ test.describe('Navigation Bar', () => {
 
         // locate all Navigation Item name
         const navigationBarItems = await page.locator('[class="fuse-horizontal-navigation-item-title"]').allInnerTexts()
-        console.log('Navigation Bar Items:', navigationBarItems)
-        await expect(navigationBarItems).toEqual(credentials.navigationBarItems)
+        // trim the whitespaces from each item
+        const trimmed_navigationBarItems = navigationBarItems.map(item => item.trim());
+        console.log('Navigation Bar Items:', trimmed_navigationBarItems)
+        await expect(trimmed_navigationBarItems).toEqual(credentials.navigationBarItems)
     });
 
 
@@ -38,9 +40,10 @@ test.describe('Navigation Bar', () => {
         // locate all the corresponding Menu Items
         const menuItems = await page.locator('span > fuse-horizontal-navigation-basic-item');
         const allMenuTexts = await menuItems.allInnerTexts();
-        console.log('Menu Items:', allMenuTexts);
+        const trimmed_allMenuTexts = allMenuTexts.map(item => item.trim());
+        console.log('Menu Items:', trimmed_allMenuTexts);
         // check if the Menu Items are as expected
-        await expect(allMenuTexts).toEqual(credentials.customersMenuItems);
+        await expect(trimmed_allMenuTexts).toEqual(credentials.customersMenuItems);
     });
 
 
@@ -51,9 +54,10 @@ test.describe('Navigation Bar', () => {
         // locate all the corresponding Menu Items
         const menuItems = await page.locator('span > fuse-horizontal-navigation-basic-item');
         const allMenuTexts = await menuItems.allInnerTexts();
-        console.log('Menu Items:', allMenuTexts);
+        const trimmed_allMenuTexts = allMenuTexts.map(item => item.trim());
+        console.log('Menu Items:', trimmed_allMenuTexts);
         // check if the Menu Items are as expected
-        await expect(allMenuTexts).toEqual(credentials.ordersMenuItems);
+        await expect(trimmed_allMenuTexts).toEqual(credentials.ordersMenuItems);
     });
 
 
@@ -64,9 +68,10 @@ test.describe('Navigation Bar', () => {
         // locate all the corresponding Menu Items
         const menuItems = await page.locator('span > fuse-horizontal-navigation-basic-item');
         const allMenuTexts = await menuItems.allInnerTexts();
-        console.log('Menu Items:', allMenuTexts);
+        const trimmed_allMenuTexts = allMenuTexts.map(item => item.trim());
+        console.log('Menu Items:', trimmed_allMenuTexts);
         // check if the Menu Items are as expected
-        await expect(allMenuTexts).toEqual(credentials.recordsMenuItems);
+        await expect(trimmed_allMenuTexts).toEqual(credentials.recordsMenuItems);
     });
 
 
@@ -77,9 +82,10 @@ test.describe('Navigation Bar', () => {
         // locate all the corresponding Menu Items
         const menuItems = await page.locator('span > fuse-horizontal-navigation-basic-item');
         const allMenuTexts = await menuItems.allInnerTexts();
-        console.log('Menu Items:', allMenuTexts);
+        const trimmed_allMenuTexts = allMenuTexts.map(item => item.trim());
+        console.log('Menu Items:', trimmed_allMenuTexts);
         // check if the Menu Items are as expected
-        await expect(allMenuTexts).toEqual(credentials.usersMenuItems);
+        await expect(trimmed_allMenuTexts).toEqual(credentials.usersMenuItems);
     });
 
 
@@ -90,9 +96,10 @@ test.describe('Navigation Bar', () => {
         // locate all the corresponding Menu Items
         const menuItems = await page.locator('div > button');
         const allMenuTexts = await menuItems.allInnerTexts();
-        console.log('Menu Items:', allMenuTexts);
+        const trimmed_allMenuTexts = allMenuTexts.map(item => item.trim());
+        console.log('Menu Items:', trimmed_allMenuTexts);
         // check if the Menu Items are as expected
-        await expect(allMenuTexts).toEqual(credentials.accountMenuItems);
+        await expect(trimmed_allMenuTexts).toEqual(credentials.accountMenuItems);
     });
 
 
