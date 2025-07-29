@@ -60,6 +60,10 @@ test.describe('Add Customer page', async () => {
         await expect(page.locator('[formcontrolname="password"]')).toBeVisible()
         // check reveal button
         await expect(page.locator('mat-form-field').filter({ hasText: 'Password' }).getByRole('button')).toBeVisible()
+        // check input limit
+        const input_password = page.locator('input[formcontrolname="password"]')
+        const hintId_password = await input_password.getAttribute('aria-describedby')
+        await expect(page.locator(`#${hintId_password}`)).toHaveText('0/25')
 
         // check button
         await expect(page.getByRole('button', { name: 'Add Customer' })).toBeVisible();
@@ -147,6 +151,19 @@ test.describe('Add Customer page', async () => {
         console.log('Length of input Login:', credentials.over20Char.length)
         console.log('Actual displayed Login:', cap20Char_Login)
         console.log('Length of displayed Name:', cap20Char_Login.length)
+    });
+
+
+    test('check maximum cap for Password input field', async ({ page }) => {
+        // input Password field with more than 25 characters
+        await page.locator('[formcontrolname="password"]').fill(credentials.over25Char)
+        // check the displayed Login
+        const cap25Char_Password = await page.inputValue('[formcontrolname="password"]')
+        await expect(cap25Char_Password).toBe('a'.repeat(25))
+        console.log('#Try to input at Login:', credentials.over25Char)
+        console.log('Length of input Login:', credentials.over25Char.length)
+        console.log('Actual displayed Login:', cap25Char_Password)
+        console.log('Length of displayed Name:', cap25Char_Password.length)
     });
 
 
