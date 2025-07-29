@@ -13,9 +13,12 @@ test.beforeEach('Login to MIRA Production portal', async ({ page }) => {
     await expect(page.locator('app-login')).toBeVisible();
     await page.getByLabel('Username').fill(credentials.customerName_true);
     await page.getByLabel('Password').fill(credentials.customerPassword_true);
-    await page.getByRole('button', { name: 'Login' }).click();
-    // wait to land to MIRA Production portal
-    await page.waitForSelector('p-menu', { state: 'visible', timeout: 20000 });
+    await Promise.all([
+        // wait to land to MIRA Production portal
+        page.waitForSelector('p-menu', { state: 'visible', timeout: 20000 }),
+        // click on the Login button
+        page.getByRole('button', { name: 'Login' }).click(),
+    ])
 });
 
 
@@ -23,9 +26,12 @@ test.beforeEach('Login to MIRA Production portal', async ({ page }) => {
 test.describe('Products section', async () => {
 
     test.beforeEach('Go to Products section', async ({ page }) => {
-        // go to Products section
-        await page.getByRole('menuitem', { name: 'Products' }).click();
-        await expect(page).toHaveURL(/products/);
+        await Promise.all([
+            // wait to land to Products section
+            page.waitForURL(/products/, { state: 'load', timeout: 20000 }),
+            // click on the Porducts button
+            page.getByRole('menuitem', { name: 'Products' }).click(),
+        ])
     });
 
 
@@ -46,9 +52,10 @@ test.describe('Products section', async () => {
          */
         const tableHeader = await page.locator('table > thead > th');
         const tableHeaderTexts = await tableHeader.allInnerTexts();
-        console.log('Products Table Header Row:', tableHeaderTexts);
+        const trimmed_tableHeaderTexts = tableHeaderTexts.map(item => item.trim());
+        console.log('Products Table Header Row:', trimmed_tableHeaderTexts);
         // check if the Table Header row is as expected
-        await expect(tableHeaderTexts).toEqual(credentials.products_tableHeaderTexts);
+        await expect(trimmed_tableHeaderTexts).toEqual(credentials.products_tableHeaderTexts);
 
         // check list vs icon display switch
         await expect(page.getByRole('group')).toBeVisible()
@@ -121,5 +128,56 @@ test.describe('Products section', async () => {
         } else {
             console.log('Skipping screenshot comparison for headed mode.')
         }
+    })
+})
+
+
+
+test.describe('Product deatial page', async () => {
+
+    test.beforeEach('Go to Products section', async ({ page }) => {
+        // go to Products section
+        await Promise.all([
+            page.waitForURL(/products/, { state: 'load', timeout: 20000 }),
+            page.getByRole('menuitem', { name: 'Products' }).click(),
+        ])
+    });
+
+    test.beforeEach('Go to the desired Product detail page', async ({ page }) => {
+        // select the desired Product
+        await Promise.all([
+            // wait for the desired Product Name to be visible
+            page.waitForURL(/products\/\d+/),
+            // click on the Product link
+            page.getByRole('link', { name: credentials.productName }).click(),
+        ])
+    })
+
+    test('check elements on Product detail page', async ({ page }) => {
+        // check header
+        const product_header = page.locator('p-panel > div > div > div > span')
+        console.log('Product Header:', (await product_header.innerText()).trim())
+        expect(product_header).toHaveText(credentials.productName);
+
+        // check Product's Description and Requested quantity
+        // Locate the "Description:" label
+        const product_Description = page.locator('app-stat-list > div > div').filter({ hasText: /^\s*Description:\s*/ });
+        await expect(product_Description).toBeVisible();
+        const descriptionText = product_Description.locator('.text-right');
+        console.log('Product Description:', (await descriptionText.innerText()).trim());
+        expect(descriptionText).toHaveText(credentials.productDescription);
+        // Locate the "Requested:" label
+        const product_RequestedQuantity = page.locator('app-stat-list > div > div').filter({ hasText: /^\s*Requested:\s*/ });
+        await expect(product_RequestedQuantity).toBeVisible();
+        const requestedQuantity = (await product_RequestedQuantity.locator('.text-right').innerText()).trim();
+        console.log('Product Requested Quantity:', requestedQuantity);
+
+        // check presence of any available Traveler template
+        const count = await page.locator("[data-pc-name = panel]").count();
+        expect(count).toBeGreaterThan(0);
+        // check the expand button
+        const traveler_template = page.locator('div > p-panel > div').first()
+        const hintId_name = await traveler_template.getAttribute('id')
+        await expect(page.locator(`#${hintId_name + '_header'}`)).toBeVisible()
     })
 })
