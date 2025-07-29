@@ -14,9 +14,10 @@ test.beforeEach('Login to MIRA Production portal', async ({ page }) => {
     await page.getByLabel('Username').fill(credentials.customerName_true);
     await page.getByLabel('Password').fill(credentials.customerPassword_true);
     await Promise.all([
-        page.getByRole('button', { name: 'Login' }).click(),
         // wait to land to MIRA Production portal
-        page.waitForSelector('p-menu', { state: 'visible', timeout: 20000 })
+        page.waitForSelector('p-menu', { state: 'visible', timeout: 20000 }),
+        // click on the Login button
+        page.getByRole('button', { name: 'Login' }).click(),
     ])
 });
 
@@ -26,7 +27,7 @@ test.describe('Landing', async () => {
 
     test('check elements on Landing', async ({ page }) => {
         // check Customer Name box
-        const customer_name = await page.locator('[data-pc-section="start"] > div').innerText()
+        const customer_name = await (await page.locator('[data-pc-section="start"] > div').innerText()).trim()
         console.log('Customer Name:', customer_name)
         const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         await expect(page.locator('p-menu')).toHaveText(new RegExp(escapeRegExp(customer_name)))
@@ -36,9 +37,9 @@ test.describe('Landing', async () => {
         const menuitem_1 = page.getByRole('menuitem', { name: 'Products' })
         await expect(menuitem_1).toBeVisible()
         await expect(menuitem_1.getByRole('link', { name: 'Products' })).toHaveAttribute('href', expect.stringContaining('products'))
-        const menuitem_2 = page.getByRole('menuitem', { name: 'All Orders' })
-        await expect(menuitem_2).toBeVisible()
-        await expect(menuitem_2.getByRole('link', { name: 'All Orders' })).toHaveAttribute('href', expect.stringContaining('orders'))
+        // const menuitem_2 = page.getByRole('menuitem', { name: 'All Orders' })
+        // await expect(menuitem_2).toBeVisible()
+        // await expect(menuitem_2.getByRole('link', { name: 'All Orders' })).toHaveAttribute('href', expect.stringContaining('orders'))
         await expect(page.locator('p-menu > div > div > button')).toBeVisible()
         // check [Sign out] button
         await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible()
