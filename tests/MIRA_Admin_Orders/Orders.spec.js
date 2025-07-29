@@ -152,11 +152,15 @@ test.describe('Add Order page', async () => {
         // Select customer
         const customer_dropdown = page.locator('[formcontrolname="customer"]')
         await expect(customer_dropdown).toBeVisible();
-        await customer_dropdown.click()
-        await page.waitForSelector('mat-option', { state: 'visible', timeout: 8000 })
+        await Promise.all([
+            // wait for dropdown options to be visible
+            page.waitForSelector('mat-option', { state: 'visible', timeout: 8000 }),
+            // click to expand the dropdown
+            customer_dropdown.click(),
+        ])
 
         const customer_option = page.getByRole('option').first()
-        const customer_selection = await customer_option.innerText()
+        const customer_selection = (await customer_option.innerText()).trim()
         await customer_option.click()
         await expect(page.locator('[formcontrolname="customer"]')).toHaveText(customer_selection)
         console.log('Selected Customer:', customer_selection)
@@ -168,7 +172,7 @@ test.describe('Add Order page', async () => {
         await page.waitForTimeout(500) // or a better wait condition if you have one
 
         const product_option = page.getByRole('option').first()
-        const product_selection = await product_option.innerText()
+        const product_selection = (await product_option.innerText()).trim()
         await product_option.click()
         await expect(page.locator('[formcontrolname="productId"]')).toHaveText(product_selection)
         console.log('Selected Product:', product_selection)

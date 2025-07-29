@@ -218,12 +218,16 @@ test.describe('Add User page', async () => {
     test('check Groups selection', async ({ page }) => {
         const groups_dropdown = page.locator('[formcontrolname="groups"]')
         await expect(groups_dropdown).toBeVisible();
-        await groups_dropdown.click()
-        await page.waitForSelector('mat-option', { state: 'visible', timeout: 8000 })
+        await Promise.all([
+            // wait for the dropdown to be visible
+            page.waitForSelector('mat-option', { state: 'visible', timeout: 8000 }),
+            // click to expand the dropdown
+            groups_dropdown.click(),
+        ])
 
         // select the first group option
         const groups_option = page.getByRole('option').first()
-        const groups_selection = await groups_option.innerText()
+        const groups_selection = (await groups_option.innerText()).trim()
         await groups_option.click()
         // press the Escape key to collapse the dropdown
         await page.keyboard.press('Escape')

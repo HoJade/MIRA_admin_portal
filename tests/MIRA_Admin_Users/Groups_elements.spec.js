@@ -143,13 +143,17 @@ test.describe('Add Group sub-page', async () => {
         // await page.waitForLoadState('networkidle');
         const roles_dropdown = page.locator('[formcontrolname="groupRoles"]')
         await expect(roles_dropdown).toBeVisible();
-        await roles_dropdown.click({ force: true })
-        await page.waitForSelector('div[role="listbox"]', { state: 'attached', timeout: 8000 });
-        await page.waitForSelector('mat-option', { state: 'visible', timeout: 8000 })
+        await Promise.all([
+            // wait for the dropdown to be visible
+            page.waitForSelector('div[role="listbox"]', { state: 'attached', timeout: 8000 }),
+            page.waitForSelector('mat-option', { state: 'visible', timeout: 8000 }),
+            // click to expand the dropdown
+            roles_dropdown.click({ force: true }),
+        ])
 
         // select the first role option
         const roles_option = page.getByRole('option').first()
-        const roles_selection = await roles_option.innerText()
+        const roles_selection = (await roles_option.innerText()).trim()
         await roles_option.click()
         // press the Escape key to collapse the dropdown
         await page.keyboard.press('Escape')
@@ -162,13 +166,17 @@ test.describe('Add Group sub-page', async () => {
         // await page.waitForLoadState('networkidle');
         const users_dropdown = page.locator('[formcontrolname="userGroups"]')
         await expect(users_dropdown).toBeVisible();
-        await users_dropdown.click()
-        await page.waitForSelector('div[role="listbox"]', { state: 'attached', timeout: 8000 });
-        await page.waitForSelector('mat-option', { state: 'visible', timeout: 8000 })
+        await Promise.all([
+            // wait for the dropdown to be visible
+            page.waitForSelector('div[role="listbox"]', { state: 'attached', timeout: 8000 }),
+            page.waitForSelector('mat-option', { state: 'visible', timeout: 8000 }),
+            // click to expand the dropdown
+            users_dropdown.click(),
+        ])
 
         // select the first user option
         const users_option = page.getByRole('option').first()
-        const users_selection = await users_option.innerText()
+        const users_selection = (await users_option.innerText()).trim()
         await users_option.click()
         // press the Escape key to collapse the dropdown
         await page.keyboard.press('Escape')
