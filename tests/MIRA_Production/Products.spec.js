@@ -47,7 +47,7 @@ test.describe('Products section', async () => {
         await expect(searchBox).toBeEmpty()
 
         /**
-         * check table list
+         * check Products table list
          * locate the Table Header row 
          */
         const tableHeader = await page.locator('table > thead > th');
@@ -133,7 +133,7 @@ test.describe('Products section', async () => {
 
 
 
-test.describe('Product deatial page', async () => {
+test.describe('Product detail page', async () => {
 
     test.beforeEach('Go to Products section', async ({ page }) => {
         // go to Products section
@@ -176,8 +176,46 @@ test.describe('Product deatial page', async () => {
         const count = await page.locator("[data-pc-name = panel]").count();
         expect(count).toBeGreaterThan(0);
         // check the expand button
-        const traveler_template = page.locator('div > p-panel > div').first()
+        const traveler_template = page.locator('div > p-panel > div').nth(0)
         const hintId_name = await traveler_template.getAttribute('id')
-        await expect(page.locator(`#${hintId_name + '_header'}`)).toBeVisible()
+        const expand_Button = page.locator(`#${hintId_name + '_header'}`)
+        await expect(expand_Button).toBeVisible()
+        await expect(expand_Button.locator('plusicon')).toBeAttached()
+
+        //expand the template tile
+        await expand_Button.click()
+        await expect(expand_Button.locator('minusicon')).toBeAttached()
+        const expanded_template = page.locator(`#${hintId_name}_content`)
+        await expect(expanded_template).toBeVisible()
+        await expect(expanded_template).toHaveAttribute('aria-hidden', 'false')
+        // check the template process summary
+        await expect(expanded_template.locator('app-stat-list')).toBeVisible()
+        // check search box and placeholder
+        await expect(expanded_template.locator('p-iconfield')).toBeVisible()
+        await expect(expanded_template.locator('[class="p-input-icon"]')).toBeVisible()
+        const searchBox = await expanded_template.getByRole('textbox')
+        await expect(searchBox).toHaveAttribute('placeholder', 'Search...')
+        await expect(searchBox).toBeEmpty()
+
+        /**
+         * check template table list
+         * locate the Table Header row 
+         */
+        const tableHeader = await expanded_template.locator('table > thead > th');
+        const tableHeaderTexts = await tableHeader.allInnerTexts();
+        const trimmed_tableHeaderTexts = tableHeaderTexts.map(item => item.trim());
+        console.log('Products Table Header Row:', trimmed_tableHeaderTexts);
+        // check if the Table Header row is as expected
+        const [first, second, ...rest] = trimmed_tableHeaderTexts;
+        expect(first).toBe(credentials.productDetail_tableHeaderTexts[0]);
+        expect(credentials.acceptableSecond).toContain(second)
+        expect(rest).toEqual(credentials.productDetail_tableHeaderTexts.slice(1));
+
+        // collapse the template tile
+        await page.waitForTimeout(500)
+        await expand_Button.click();
+        await expect(expand_Button.locator('plusicon')).toBeAttached()
+        await expect(expanded_template).not.toBeVisible()
+        await expect(expanded_template).toHaveAttribute('aria-hidden', 'true')
     })
 })
