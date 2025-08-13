@@ -177,15 +177,15 @@ test.describe('Product detail page', async () => {
         expect(count).toBeGreaterThan(0);
         // check the expand button
         const traveler_template = page.locator('div > p-panel > div').nth(0)
-        const hintId_name = await traveler_template.getAttribute('id')
-        const expand_Button = page.locator(`#${hintId_name + '_header'}`)
+        const hintId_template = await traveler_template.getAttribute('id')
+        const expand_Button = page.locator(`#${hintId_template + '_header'}`)
         await expect(expand_Button).toBeVisible()
         await expect(expand_Button.locator('plusicon')).toBeAttached()
 
         //expand the template tile
         await expand_Button.click()
         await expect(expand_Button.locator('minusicon')).toBeAttached()
-        const expanded_template = page.locator(`#${hintId_name}_content`)
+        const expanded_template = page.locator(`#${hintId_template}_content`)
         await expect(expanded_template).toBeVisible()
         await expect(expanded_template).toHaveAttribute('aria-hidden', 'false')
         // check the template process summary
