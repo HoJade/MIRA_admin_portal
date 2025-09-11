@@ -133,6 +133,10 @@ test.describe('Traveler Builder', () => {
             await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled();
             await expect(page.getByRole('button', { name: 'Cancel' })).toBeVisible();
             await expect(page.getByRole('button', { name: 'Cancel' })).toBeEnabled();
+
+            // close the dialog box
+            await page.getByRole('button', { name: 'Cancel' }).click();
+            await expect(page.getByRole('dialog')).not.toBeAttached();
         });
 
 
