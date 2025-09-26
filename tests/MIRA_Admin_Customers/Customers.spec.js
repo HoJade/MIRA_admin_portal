@@ -1,8 +1,6 @@
 import { test, expect } from '@playwright/test';
 // import the configuration
 import * as credentials from '../../config/credential'
-import exp from 'constants';
-import { info } from 'console';
 
 // set the retry parameter explicitly for this test script
 // test.describe.configure({ retries: 0 })
@@ -531,6 +529,7 @@ test.describe('Customer details page', async () => {
             // fill Confirm Password field
             await page.getByLabel(/^Confirm Password$/).fill(credentials.password_false)
             // check Confirm Password field
+            await page.locator('label').filter({ hasText: /^\s*Confirm Password\s*$/ }).click()
             await expect(page.locator('mat-error').filter({ hasText: credentials.confirmNewPassword_notMatch_message })).toBeVisible()
         });
 
