@@ -16,6 +16,7 @@ const { defineConfig, devices } = require('@playwright/test');
 import { ARTILLERY_CLOUD_API_KEY } from './config/credential'
 
 // set up reporters; Keep the HTML report if needed, so you can still generate local HTML reports
+/** @type {import('@playwright/test').ReporterDescription[]} */
 const reporters = [
   ["html"]
 ];
