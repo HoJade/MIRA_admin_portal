@@ -34,7 +34,7 @@ const enableArtilleryReporter = !!process.env.ENABLE_ARTILLERY_REPORTER && proce
 if (enableArtilleryReporter) {
   // Set the Artillery Cloud API Key
   process.env.ARTILLERY_CLOUD_API_KEY = ARTILLERY_CLOUD_API_KEY;
-  reporters.push(["@artilleryio/playwright-reporter", { name: "My Test Suite" }]);
+  reporters.push(["@artilleryio/playwright-reporter", { name: "MIRA Automation Test Suite" }]);
 }
 
 
