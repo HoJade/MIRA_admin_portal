@@ -23,6 +23,12 @@ const reporters = [
 
 // Enable Artillery Cloud reporter only if the environment variable is set
 // Default ENABLE_ARTILLERY_REPORTER to "false" if not explicitly set
+/*  bash
+  ENABLE_ARTILLERY_REPORTER=true npx playwright test
+*/
+/*  powershell
+  $env:ENABLE_ARTILLERY_REPORTER="true"; npx playwright test; Remove-Item env:ENABLE_ARTILLERY_REPORTER
+*/
 const enableArtilleryReporter = !!process.env.ENABLE_ARTILLERY_REPORTER && process.env.ENABLE_ARTILLERY_REPORTER.toLowerCase() === "true";
 
 if (enableArtilleryReporter) {
